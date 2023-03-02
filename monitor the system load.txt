@@ -1,0 +1,63 @@
+# !/bash/bin 
+##script to monitor the system load
+##exit codes
+## 0 for normal case
+## 1 for check the usage
+## 3 if the usage increase
+
+
+       IP4=$(hostname -I) #variable to save IP of the machine
+
+
+
+while :
+do
+
+                  # get the current usage of cpu and memory
+
+                    CPU=$( top -bn1 | awk '/Cpu/ {print $2}' )
+
+
+                  MEMUSAGE=$( free -m | head -n2 | tail -n1 | awk '{print $3}' )
+
+
+
+                        #print the usage
+
+                          echo "cpu usage; $CPU %"
+
+                                                                                                           echo "memory usage; $MEMUSAGE Mb"
+                            sleep 1
+################################
+
+
+CPUMAX=`echo " $CPU > 4.0 " |bc -l `  #save the value of max usage of CPU
+MINLOAD=$( uptime | awk '  BEGIN{FS=OFS=":"} { print $5 }' | awk ' BEGIN{FS=OFS=","} { print $1 } ' ) # 1 min load
+MINLOAD5=$( uptime | awk ' BEGIN{FS=OFS=":"} { print $5 }' | awk ' BEGIN{FS=OFS=","} { print $2 } ' ) # 5 min load
+MINLOAD15=$( uptime| awk ' BEGIN{FS=OFS=":"} { print $5 }' | awk ' BEGIN{FS=OFS=","} { print $3 } ' ) # 15 min load
+
+                            if [ ${CPUMAX} -eq 1  ] || [ ${MEMUSAGE} -ge 1461 ]   ##Check for usage
+                            then
+  echo " subject: Server $IP4 load  
+  Body: 
+                        dear , 
+                           the system $HOSTNAME runs with $IP4 has load 
+                           1 min load : $MINLOAD    
+                           5 min load : $MINLOAD5  
+                           15 min load : $MINLOAD15 
+   thanks  " >/tmp/events
+
+echo " The load at $(date)  is 
+  CPUload :$CPU 
+  MEMORYUSAGE : $MEMUSAGE    " >  /var/log/systemload
+
+
+  echo "warning the load increases go to /var/log/systemload or /tmp/events  " 
+                            exit 3
+
+
+                            fi
+                      done
+
+
+
