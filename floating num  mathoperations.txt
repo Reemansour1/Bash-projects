@@ -1,0 +1,79 @@
+# !/bin/bash
+## script to perform floating point op in bash 
+### Exit codes
+
+# 1 = insufficient param 
+# 2=  incorrect opearatorr
+# 3= the 1st num isnt float
+# 4= the 2nd num isnt float
+# 0=success of sum 
+# 5=success of difference
+# 6= success of multiply
+# 7= success  of div
+
+
+VAL1=${1}
+VAL2=${2}
+
+# check for total parameters
+
+ [ ${#} -ne 2 ]  && echo "insufficient parameters" && exit 1
+
+##the first  num is float
+FLOAT1=$(echo ${VAL1} | grep "^\-\{0,1\}[0-9]*[.][0-9]*$" | wc -l)
+
+[ ${FLOAT1}  -eq  0 ]  && echo "invalid float 1"   && exit 3
+
+
+
+##the second  num is float
+FLOAT2=$(echo ${VAL2} | grep "^\-\{0,1\}[0-9]*[.][0-9]*$" | wc -l)
+
+[ ${FLOAT2} -eq  0  ]  && echo "invalid float 2"   && exit 4
+
+
+#######################################################################
+
+#operations
+read -p "enter sum , difference , multiply , devison: "  OPERATION
+
+#sum
+if [  ${OPERATION} == "sum" ]
+      then
+      echo " ${VAL1} + ${VAL2} " | bc
+
+      exit 0
+
+#difference
+elif [ ${OPERATION} == "difference" ]
+       then
+       echo "${VAL1} - ${VAL2}" | bc
+       exit 5
+
+
+
+#multiply
+
+elif [ ${OPERATION} == "multiply" ]
+       then
+       echo "${VAL1} * ${VAL2}"        | bc
+       exit 6
+
+
+
+#devision
+
+elif [  ${OPERATION} == "devision" ]
+        then
+        echo " scale=5 ; ${VAL1} / ${VAL2}"        | bc
+        exit 7
+
+#incorrect input
+else
+
+
+        echo "Invalid operation"
+
+fi
+
+
